@@ -75,7 +75,14 @@ export default function ChatPage() {
   return (
     <>
       <div className="flex items-center justify-center min-h-screen bg-gray-900 text-gray-100">
-        <Image src="/bg.jpg" alt="Logo" className="object-cover absolute top-0 left-0 rotate-0 w-full h-screen z-0 opacity-20" width={1920} height={1080} />
+        <Image
+          src="/bg.jpg"
+          alt="Logo"
+          className="object-cover absolute top-0 left-0 rotate-0 w-full h-screen z-0 opacity-20"
+          loading="lazy"
+          width={1920}
+          height={1080}
+        />
         <div className="w-full max-w-2xl bg-gray-800 rounded-xl shadow-lg p-4 flex flex-col z-10">
           {/* Header */}
           <div className="border-b border-gray-700 pb-2 mb-3">
