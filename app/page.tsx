@@ -13,22 +13,21 @@ export default function ChatPage() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [text, setText] = useState("");
   const connectedRef = useRef(false);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const roomId = "room-1";
   const [user, setUser] = useState("def-user");
 
   useEffect(() => {
-    const name = prompt("Enter your name");
-    if (name) setUser(name);
-    else setUser("def-user");
-
     if (connectedRef.current) return;
     connectedRef.current = true;
 
+    const name = prompt("Enter your name")?.trim() || "def-user";
+    setUser(name);
+
     socket.connect();
 
-    socket.emit("join-room", { roomId, user });
-
+    // ✅ listeners FIRST
     socket.on("chat-history", (msgs: Message[]) => {
       setMessages(msgs);
     });
@@ -41,6 +40,9 @@ export default function ChatPage() {
       console.error("Socket error:", err.message);
     });
 
+    // ✅ emit AFTER listeners, and use local name
+    socket.emit("join-room", { roomId, user: name });
+
     return () => {
       socket.off("chat-history");
       socket.off("new-message");
@@ -48,6 +50,10 @@ export default function ChatPage() {
       connectedRef.current = false;
     };
   }, []);
+
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages]);
 
   const sendMessage = () => {
     if (!text.trim()) return;
@@ -80,7 +86,7 @@ export default function ChatPage() {
           </div>
 
           {/* Messages */}
-          <div className="flex-1 overflow-y-auto space-y-2 pr-1">
+          <div className="flex-1 overflow-y-auto space-y-3 pr-2 max-h-[60vh] scrollbar-thin scrollbar-thumb-gray-600 scrollbar-track-gray-800">
             {messages.map((m, i) => {
               const isSystem = m.user === "System";
               const isMe = m.user === user;
@@ -91,7 +97,7 @@ export default function ChatPage() {
                   className={`flex ${isMe ? "justify-end" : "justify-start"}`}
                 >
                   <div
-                    className={`max-w-[75%] rounded-lg px-3 py-2 text-sm ${
+                    className={`max-w-[75%] rounded-xl px-4 py-2 text-sm shadow ${
                       isSystem
                         ? "bg-red-900/40 text-red-300 mx-auto"
                         : isMe
@@ -100,21 +106,22 @@ export default function ChatPage() {
                     }`}
                   >
                     {!isSystem && (
-                      <div className="text-xs text-gray-300 mb-1">
-                        <span className="font-medium">{m.user}</span>{" "}
+                      <div className="text-xs text-gray-300 mb-1 flex justify-between gap-2">
+                        <span className="font-medium">{m.user}</span>
                         <span className="opacity-60">{m.time}</span>
                       </div>
                     )}
 
-                    {isSystem ? (
-                      <span className="italic">{m.text}</span>
-                    ) : (
-                      <span>{m.text}</span>
-                    )}
+                    <p className="whitespace-pre-wrap break-words">
+                      {isSystem ? <i>{m.text}</i> : m.text}
+                    </p>
                   </div>
                 </div>
               );
             })}
+
+            {/* 👇 THIS is what you scroll to */}
+            <div ref={messagesEndRef} />
           </div>
 
           {/* Input */}
