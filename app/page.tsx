@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { socket } from "@/lib/socket";
+import Image from "next/image";
 
 type Message = {
   user: string;
@@ -74,7 +75,8 @@ export default function ChatPage() {
   return (
     <>
       <div className="flex items-center justify-center min-h-screen bg-gray-900 text-gray-100">
-        <div className="w-full max-w-2xl bg-gray-800 rounded-xl shadow-lg p-4 flex flex-col">
+        <Image src="/bg.jpg" alt="Logo" className="object-cover absolute top-0 left-0 rotate-0 w-full h-screen z-0 opacity-20" width={1920} height={1080} />
+        <div className="w-full max-w-2xl bg-gray-800 rounded-xl shadow-lg p-4 flex flex-col z-10">
           {/* Header */}
           <div className="border-b border-gray-700 pb-2 mb-3">
             <h2 className="text-lg font-semibold">
@@ -86,7 +88,7 @@ export default function ChatPage() {
           </div>
 
           {/* Messages */}
-          <div className="flex-1 overflow-y-auto space-y-3 pr-2 max-h-[60vh] scrollbar-thin scrollbar-thumb-gray-600 scrollbar-track-gray-800">
+          <div className="flex-1 overflow-y-auto space-y-3 pr-2 max-h-[60vh] [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-gray-100 [&::-webkit-scrollbar-thumb]:bg-gray-300 dark:[&::-webkit-scrollbar-track]:bg-neutral-700 dark:[&::-webkit-scrollbar-thumb]:bg-neutral-500">
             {messages.map((m, i) => {
               const isSystem = m.user === "System";
               const isMe = m.user === user;
